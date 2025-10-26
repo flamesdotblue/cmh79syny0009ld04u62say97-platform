@@ -1,28 +1,46 @@
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react';
+import Header from './components/Header.jsx';
+import Hero from './components/Hero.jsx';
+import Features from './components/Features.jsx';
+import Footer from './components/Footer.jsx';
 
 function App() {
-  const [count, setCount] = useState(0)
+  // Simple i18n toggle between English and Arabic
+  const [locale, setLocale] = useState('en');
+
+  useEffect(() => {
+    const qp = new URLSearchParams(window.location.search);
+    const lang = qp.get('lang');
+    if (lang && ['en', 'ar'].includes(lang)) setLocale(lang);
+  }, []);
+
+  const t = useMemo(() => {
+    const map = {
+      en: {
+        start: 'Start free',
+        demo: 'Book a demo',
+        noCard: 'No credit card required',
+      },
+      ar: {
+        start: 'ابدأ مجانًا',
+        demo: 'احجز عرضًا توضيحيًا',
+        noCard: 'لا حاجة لبطاقة بنكية',
+      },
+    };
+    return map[locale];
+  }, [locale]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 flex items-center justify-center">
-      <div className="bg-white p-8 rounded-lg shadow-lg">
-        <h1 className="text-3xl font-bold text-gray-800 mb-4">
-          Vibe Coding Platform
-        </h1>
-        <p className="text-gray-600 mb-6">
-          Your AI-powered development environment
-        </p>
-        <div className="text-center">
-          <button
-            onClick={() => setCount(count + 1)}
-            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded"
-          >
-            Count is {count}
-          </button>
-        </div>
-      </div>
+    <div className={locale === 'ar' ? 'font-sans antialiased dark:bg-[#0B0F19] dark:text-white' : 'font-sans antialiased dark:bg-[#0B0F19] dark:text-white'} dir={locale === 'ar' ? 'rtl' : 'ltr'}>
+      <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 bg-black text-white px-3 py-2 rounded">Skip to content</a>
+      <Header locale={locale} setLocale={setLocale} labels={t} />
+      <main id="main">
+        <Hero labels={t} locale={locale} />
+        <Features locale={locale} />
+      </main>
+      <Footer locale={locale} />
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
